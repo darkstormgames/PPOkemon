@@ -1,0 +1,56 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch drl_test Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/drl_test_debug",
+      "args": [
+        "--seed", "42",
+        "--n_envs", "2",
+        "--exp_path", "exp",
+        "--normalize_env_obs", "1",
+        "--normalize_env_reward", "1",
+        "--batch_size", "256",
+        "--n_steps", "1024",
+        "--n_epochs", "6",
+        "--val_loss_weight", "0.5",
+        "--entropy_loss_weight", "0.01",
+        "--max_grad_norm", "0.5",
+        "--init_sampling_log_std", "-0.5",
+        "--ortho_init", "1",
+        "--gamma", "0.995",
+        "--lambda_gae", "0.95",
+        "--clip_value", "0.15",
+        "--lr", "3e-4",
+        "--normalize_advantage", "true",
+        "--clip_range", "0.15",
+        "--vf_coef", "0.5",
+        "--ent_coef", "0.025",
+        "--initial_random_steps", "512",
+        "--cnn_out_features", "256",
+        "--mlp_hidden_units", "128",
+        "--use_cnn", "true",
+        "--log_interval", "1",
+        "--use_gpu_if_available", "true",
+        "--total_timesteps_per_iteration", "8192",
+        "--max_iterations", "2",
+        "--render_mode", "sdl"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "Build Project Debug"
+    }
+  ]
+}

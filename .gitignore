@@ -1,3 +1,21 @@
+# Rom files
+*.gb
+*.gbc
+*.gba
+*.bin
+*.sav
+
+# source directories
+gambatte-core/
+libtorch*/
+build/
+
+# Built files and training directories
+ppokemon
+ppokemon_cli
+
+exp/
+
 # Prerequisites
 *.d
 
@@ -30,3 +48,17 @@
 *.exe
 *.out
 *.app
+
+# CMakefile artifacts
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+CMakeUserPresets.json

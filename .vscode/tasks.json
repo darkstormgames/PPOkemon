@@ -1,0 +1,109 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Clean build folder",
+      "type": "shell",
+      "command": "rm -rf build && mkdir -p build",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CMake Debug",
+      "type": "shell",
+      "command": "cmake -DCMAKE_BUILD_TYPE=Debug ..",
+      "options": {
+        "cwd": "${workspaceFolder}/build",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "dependsOn": "Clean build folder",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CMake Release",
+      "type": "shell",
+      "command": "cmake -DCMAKE_BUILD_TYPE=Release ..",
+      "options": {
+        "cwd": "${workspaceFolder}/build",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "dependsOn": "Clean build folder",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build with Make",
+      "type": "shell",
+      "command": "make -j$(nproc)",
+      "options": {
+        "cwd": "${workspaceFolder}/build",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Copy Debug Binary to Workspace",
+      "type": "shell",
+      "command": "cp drl_test ../bin/drl_test_debug",
+      "options": {
+        "cwd": "${workspaceFolder}/build",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "dependsOn": "Build with Make",
+      "problemMatcher": []
+    },
+    {
+      "label": "Copy Release Binary to Workspace",
+      "type": "shell",
+      "command": "cp drl_test ../bin/drl_test",
+      "options": {
+        "cwd": "${workspaceFolder}/build",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "dependsOn": "Build with Make",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Project Debug",
+      "dependsOn": [
+        "Clean build folder",
+        "Run CMake Debug",
+        "Build with Make",
+        "Copy Debug Binary to Workspace"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Project Release",
+      "dependsOn": [
+        "Clean build folder",
+        "Run CMake Release",
+        "Build with Make",
+        "Copy Release Binary to Workspace"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}
