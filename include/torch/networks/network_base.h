@@ -13,7 +13,7 @@ public:
     virtual torch::Tensor forward(const torch::Tensor& input) = 0;
     
     // Virtual function for orthogonal initialization (default implementation)
-    virtual void InitOrtho(const float gain = 1.0f) {}
+    virtual void InitOrtho(const float gain = 1.0f) { (void)gain; }
     
     // Optional: Get output size/features
     virtual int64_t GetOutputSize() const { return -1; }

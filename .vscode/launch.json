@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch drl_test Debug",
+      "name": "Launch PPOkemon Debug",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/drl_test_debug",
+      "program": "${workspaceFolder}/bin/ppokemon",
       "args": [
         "--seed", "42",
         "--n_envs", "2",
