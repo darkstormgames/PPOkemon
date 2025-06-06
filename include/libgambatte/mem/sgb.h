@@ -21,7 +21,7 @@
 
 #include "gbint.h"
 #include "newstate.h"
-#include "snes_spc/SNES_SPC.h"
+#include <snes_spc/SNES_SPC.h>
 
 #include <cstddef>
 

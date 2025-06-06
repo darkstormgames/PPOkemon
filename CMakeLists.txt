@@ -91,8 +91,15 @@ endif()
 # Include paths (TODO: Check, which of these are actually needed)
 # ------------------------------------------------------------------------------
 include_directories(
+  # Root directory (may be dropped if not needed)
   ${CMAKE_SOURCE_DIR}/include
+  # Common config implementation
   ${CMAKE_SOURCE_DIR}/include/config
+  # Emulation directories
+  ${CMAKE_SOURCE_DIR}/include/emulation
+  # Environments directories
+  ${CMAKE_SOURCE_DIR}/include/environments
+  # Gambatte specific directories
   ${CMAKE_SOURCE_DIR}/include/libgambatte
   ${CMAKE_SOURCE_DIR}/include/libgambatte/common
   ${CMAKE_SOURCE_DIR}/include/libgambatte/common/resample
@@ -106,25 +113,15 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/include/libgambatte/mem/snes_spc
   ${CMAKE_SOURCE_DIR}/include/libgambatte/sound
   ${CMAKE_SOURCE_DIR}/include/libgambatte/video
-  ${CMAKE_SOURCE_DIR}/src/common
-  ${CMAKE_SOURCE_DIR}/src/common/resample
-  ${CMAKE_SOURCE_DIR}/src/common/resample/src
-  ${CMAKE_SOURCE_DIR}/src/common/videolink
-  ${CMAKE_SOURCE_DIR}/src/common/videolink/vfilters
-  ${CMAKE_SOURCE_DIR}/src/emulation
-  ${CMAKE_SOURCE_DIR}/src/environments
-  ${CMAKE_SOURCE_DIR}/src/libgambatte
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/file
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/file/unzip
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/mem
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/mem/mbc
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/mem/snes_spc
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/sound
-  # ${CMAKE_SOURCE_DIR}/src/libgambatte/video
-  ${CMAKE_SOURCE_DIR}/src/torch_rl
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/envs
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/rl
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/utils
+  # Torch RL directories
+  ${CMAKE_SOURCE_DIR}/include/torch
+  ${CMAKE_SOURCE_DIR}/include/torch/algorithms
+  ${CMAKE_SOURCE_DIR}/include/torch/envs
+  ${CMAKE_SOURCE_DIR}/include/torch/networks
+  ${CMAKE_SOURCE_DIR}/include/torch/training
+  ${CMAKE_SOURCE_DIR}/include/torch/training/callbacks
+  ${CMAKE_SOURCE_DIR}/include/torch/training/evaluation
+
 )
 
 # ------------------------------------------------------------------------------
@@ -146,18 +143,21 @@ file(GLOB_RECURSE GAMBATTE_SOURCES
 )
 
 file(GLOB_RECURSE TORCH_RL_SOURCES
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/*.cpp
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/envs/*.cpp
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/rl/*.cpp
-  ${CMAKE_SOURCE_DIR}/src/torch_rl/utils/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/algorithms/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/envs/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/networks/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/training/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/training/callbacks/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/torch/training/evaluation/*.cpp
 )
 
 set(DRL_SOURCES
   ${CMAKE_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_SOURCE_DIR}/src/emulation/emu_gbc.cpp
-  ${CMAKE_SOURCE_DIR}/src/emulation/renderer.cpp
-  ${CMAKE_SOURCE_DIR}/src/emulation/inputhandler.cpp
-  ${CMAKE_SOURCE_DIR}/src/environments/pokered_v1.cpp
+  # ${CMAKE_SOURCE_DIR}/src/emulation/emu_gbc.cpp
+  # ${CMAKE_SOURCE_DIR}/src/emulation/renderer.cpp
+  # ${CMAKE_SOURCE_DIR}/src/emulation/inputhandler.cpp
+  # ${CMAKE_SOURCE_DIR}/src/environments/pokered_v1.cpp
 )
 
 find_package(Torch QUIET
