@@ -7,7 +7,7 @@ namespace networks {
 
 // A3C (Asynchronous Advantage Actor-Critic) Network
 // Uses composition instead of inheritance to avoid constructor ambiguity
-struct A3CImpl : torch::nn::Module, public NetworkBase {
+struct A3CImpl : public NetworkBase {
     // Constructor with shared backbone
     A3CImpl(SharedBackboneTag, std::shared_ptr<NetworkBase> backbone, int64_t action_dim, int64_t value_dim = 1);
     

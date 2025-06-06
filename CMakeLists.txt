@@ -5,13 +5,13 @@ project(DRLGambatteTest)
 # ------------------------------------------------------------------------------
 # Build Options
 # ------------------------------------------------------------------------------
-option(USE_WINDOWS "Use Windows as OS" OFF)
+option(USE_WINDOWS "Use Windows as OS" OFF) # not supported yet
 option(USE_CUDA "Use CUDA for GPU acceleration" ON)
 option(USE_ROCM "Use ROCm for GPU acceleration" OFF)
 option(USE_SDL2 "Use SDL2 for renderer" OFF)
 option(STATIC_LINK_LIBS "Link SDL2, zlib, and minizip statically (auto-download/build)" OFF)
 option(BUILD_MAIN_APP "Build main PPOkemon application" OFF)
-option(BUILD_TEST_APP "Build test executable" ON)
+option(BUILD_TEST_APP "Build basic test executable" ON)
 
 # ------------------------------------------------------------------------------
 # Include CMake modules
@@ -116,71 +116,7 @@ if(BUILD_TEST_APP)
   message(STATUS "Building test executable: ppokemon_test")
 endif()
 
-# ------------------------------------------------------------------------------
-# Utilities Test Executable
-# ------------------------------------------------------------------------------
-option(BUILD_UTILS_TEST "Build utilities test executable" ON)
-
-if(BUILD_UTILS_TEST)
-  add_executable(ppokemon_utils_test ${CMAKE_SOURCE_DIR}/tests/test_utils.cpp)
-  
-  # Configure utils test executable
-  target_compile_definitions(ppokemon_utils_test PRIVATE ${COMMON_DEFINITIONS})
-  target_compile_options(ppokemon_utils_test PRIVATE ${COMMON_COMPILE_FLAGS})
-  
-  # Set include directories for the utils test executable
-  set_project_includes(ppokemon_utils_test)
-  
-  # Link to the library and torch
-  target_link_libraries(ppokemon_utils_test PRIVATE ppokemon_libs)
-  link_project_libraries(ppokemon_utils_test)
-  
-  # Set specific flags for utils test
-  set_source_files_properties(${CMAKE_SOURCE_DIR}/tests/test_utils.cpp PROPERTIES
-    COMPILE_FLAGS "-frtti -fexceptions"
-  )
-  
-  # Set RPATH for dynamic builds
-  set_target_properties(ppokemon_utils_test PROPERTIES
-    BUILD_RPATH ${CMAKE_BINARY_DIR}
-    INSTALL_RPATH ${CMAKE_BINARY_DIR}
-  )
-  
-  message(STATUS "Building utilities test executable: ppokemon_utils_test")
-endif()
-
-# ------------------------------------------------------------------------------
-# Advanced Utilities Test Executable
-# ------------------------------------------------------------------------------
-option(BUILD_ADVANCED_UTILS_TEST "Build advanced utilities test executable" ON)
-
-if(BUILD_ADVANCED_UTILS_TEST)
-  add_executable(ppokemon_advanced_utils_test ${CMAKE_SOURCE_DIR}/tests/test_advanced_utils.cpp)
-  
-  # Configure advanced utils test executable
-  target_compile_definitions(ppokemon_advanced_utils_test PRIVATE ${COMMON_DEFINITIONS})
-  target_compile_options(ppokemon_advanced_utils_test PRIVATE ${COMMON_COMPILE_FLAGS})
-  
-  # Set include directories for the advanced utils test executable
-  set_project_includes(ppokemon_advanced_utils_test)
-  
-  # Link to the library and torch
-  target_link_libraries(ppokemon_advanced_utils_test PRIVATE ppokemon_libs)
-  link_project_libraries(ppokemon_advanced_utils_test)
-  
-  # Set specific flags for advanced utils test
-  set_source_files_properties(${CMAKE_SOURCE_DIR}/tests/test_advanced_utils.cpp PROPERTIES
-    COMPILE_FLAGS "-frtti -fexceptions"
-  )
-  
-  # Set RPATH for dynamic builds
-  set_target_properties(ppokemon_advanced_utils_test PROPERTIES
-    BUILD_RPATH ${CMAKE_BINARY_DIR}
-    INSTALL_RPATH ${CMAKE_BINARY_DIR}
-  )
-  
-  message(STATUS "Building advanced utilities test executable: ppokemon_advanced_utils_test")
-endif()
+# Test executables are now defined in tests/CMakeLists.txt
 
 # ------------------------------------------------------------------------------
 # Tests subdirectory

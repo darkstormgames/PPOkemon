@@ -5,7 +5,7 @@
 
 namespace networks {
 
-struct CNNBodyImpl : torch::nn::Module, public NetworkBase {
+struct CNNBodyImpl : public NetworkBase {
     // Constructor for CNN feature extractor optimized for Gameboy screen (160x144)
     CNNBodyImpl(int64_t num_input_channels, int64_t input_height, int64_t input_width, int64_t conv_out_size = 512);
     ~CNNBodyImpl();

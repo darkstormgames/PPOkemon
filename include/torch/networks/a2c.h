@@ -13,7 +13,7 @@ struct CNNTag {};
 struct MLPTag {};
 
 // A2C (Advantage Actor-Critic) Network
-struct A2CImpl : torch::nn::Module, public NetworkBase {
+struct A2CImpl : public NetworkBase {
     // Constructor with shared backbone
     A2CImpl(SharedBackboneTag, std::shared_ptr<NetworkBase> backbone, int64_t action_dim, int64_t value_dim = 1);
     

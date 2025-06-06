@@ -5,7 +5,7 @@
 
 namespace networks {
 
-struct MLPImpl : torch::nn::Module, public NetworkBase {
+struct MLPImpl : public NetworkBase {
     // Constructor for a generic MLP
     MLPImpl(const int64_t num_in, const int64_t num_hidden, const int64_t out_num);
     ~MLPImpl();

@@ -19,13 +19,9 @@ function(add_ppokemon_test TEST_NAME SOURCE_FILE)
     target_link_libraries(${TEST_NAME} PRIVATE ppokemon_libs)
     link_project_libraries(${TEST_NAME})
     
-    # Apply compile options
-    target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -O2)
-    target_compile_definitions(${TEST_NAME} PRIVATE HAVE_STDINT_H)
-    
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_definitions(${TEST_NAME} PRIVATE BUILD_DEBUG)
-    endif()
+    # Apply compile options and definitions (use the same as main project)
+    target_compile_definitions(${TEST_NAME} PRIVATE ${COMMON_DEFINITIONS})
+    target_compile_options(${TEST_NAME} PRIVATE ${COMMON_COMPILE_FLAGS})
     
     # Apply -frtti and -fexceptions for torch compatibility
     set_target_properties(${TEST_NAME} PROPERTIES
@@ -53,18 +49,19 @@ add_ppokemon_test(test_networks test_networks.cpp)
 add_ppokemon_test(test_environments test_environments.cpp)
 add_ppokemon_test(test_utils test_utils.cpp)
 add_ppokemon_test(test_advanced_utils test_advanced_utils.cpp)
+add_ppokemon_test(test_training test_training.cpp)
 
 # Additional test target that runs all tests
 add_custom_target(run_all_tests
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --verbose
-    DEPENDS test_networks test_environments test_utils test_advanced_utils
+    DEPENDS test_networks test_environments test_utils test_advanced_utils test_training
     COMMENT "Running all PPOkemon tests"
 )
 
 # Test target for continuous integration
 add_custom_target(ci_tests
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --timeout 60
-    DEPENDS test_networks test_environments test_utils test_advanced_utils
+    DEPENDS test_networks test_environments test_utils test_advanced_utils test_training
     COMMENT "Running CI tests with timeout"
 )
 
@@ -91,6 +88,12 @@ add_custom_target(run_advanced_utils_tests
     COMMAND test_advanced_utils
     DEPENDS test_advanced_utils
     COMMENT "Running advanced utilities tests"
+)
+
+add_custom_target(run_training_tests
+    COMMAND test_training
+    DEPENDS test_training
+    COMMENT "Running training component tests"
 )
 
 # Memory check target (if valgrind is available)

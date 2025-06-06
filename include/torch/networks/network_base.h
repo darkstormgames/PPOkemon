@@ -5,7 +5,7 @@
 namespace networks {
 
 // Abstract base class for all DRL networks
-class NetworkBase {
+class NetworkBase : public torch::nn::Module {
 public:
     virtual ~NetworkBase() = default;
     
