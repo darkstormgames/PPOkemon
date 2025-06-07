@@ -152,6 +152,8 @@ private:
         } \
     } while(0)
 
+#define ASSERT_CLOSE(expected, actual, tolerance) ASSERT_NEAR(expected, actual, tolerance)
+
 #define ASSERT_THROW(expression, exception_type) \
     do { \
         bool threw_correct = false; \

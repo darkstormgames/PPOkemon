@@ -1,4 +1,3 @@
-// filepath: /home/timo/PPOkemon/src/torch/training/evaluation/evaluator.cpp
 
 #include "torch/training/evaluation/evaluator.h"
 #include "torch/envs/env_abstract.h"
@@ -38,11 +37,11 @@ Metrics::AggregatedStats Evaluator::EvaluatePolicy(
     episode_stats.reserve(config_.num_eval_episodes);
     
     // Distribute episodes across environments
-    int episodes_per_env = config_.num_eval_episodes / eval_envs.size();
-    int remaining_episodes = config_.num_eval_episodes % eval_envs.size();
+    int episodes_per_env = config_.num_eval_episodes / static_cast<int>(eval_envs.size());
+    int remaining_episodes = config_.num_eval_episodes % static_cast<int>(eval_envs.size());
     
-    for (size_t env_idx = 0; env_idx < eval_envs.size() && episode_stats.size() < config_.num_eval_episodes; ++env_idx) {
-        int episodes_for_this_env = episodes_per_env + (env_idx < remaining_episodes ? 1 : 0);
+    for (size_t env_idx = 0; env_idx < eval_envs.size() && static_cast<int>(episode_stats.size()) < config_.num_eval_episodes; ++env_idx) {
+        int episodes_for_this_env = episodes_per_env + (static_cast<int>(env_idx) < remaining_episodes ? 1 : 0);
         
         for (int ep = 0; ep < episodes_for_this_env; ++ep) {
             auto episode_stat = EvaluateEpisode(policy, *eval_envs[env_idx]);
@@ -167,7 +166,7 @@ Metrics::EpisodeStats Evaluator::EvaluateWithActionSelector(
 std::vector<float> Evaluator::EvaluateReturns(
     std::shared_ptr<networks::NetworkBase> policy,
     std::vector<std::unique_ptr<AbstractEnv>>& eval_envs,
-    float gamma) {
+    float /*gamma*/) {
     
     auto episode_stats = EvaluateBatch(policy, eval_envs);
     std::vector<float> returns;
@@ -272,18 +271,18 @@ torch::Tensor Evaluator::SelectStochasticAction(std::shared_ptr<networks::Networ
 // Helper Methods
 // ============================================================================
 
-torch::Tensor Evaluator::GetObservation(AbstractEnv& env) {
+torch::Tensor Evaluator::GetObservation(AbstractEnv& /*env*/) {
     // This is a placeholder - the actual implementation depends on the environment interface
     // For now, create a dummy observation
     return torch::randn({4}); // Placeholder observation
 }
 
-void Evaluator::ResetEnvironment(AbstractEnv& env) {
+void Evaluator::ResetEnvironment(AbstractEnv& /*env*/) {
     // This is a placeholder - the actual implementation depends on the environment interface
     // env.Reset();
 }
 
-bool Evaluator::StepEnvironment(AbstractEnv& env, const torch::Tensor& action,
+bool Evaluator::StepEnvironment(AbstractEnv& /*env*/, const torch::Tensor& /*action*/,
                                float& reward, bool& done) {
     // This is a placeholder - the actual implementation depends on the environment interface
     // For now, simulate a simple environment step

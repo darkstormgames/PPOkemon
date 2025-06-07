@@ -16,6 +16,7 @@ ppokemon
 ppokemon_cli
 
 exp/
+logs/
 
 # Prerequisites
 *.d

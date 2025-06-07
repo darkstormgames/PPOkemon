@@ -56,7 +56,7 @@ void WeightInitializer::InitializeModule(torch::nn::Module& module,
     torch::NoGradGuard no_grad;
     
     for (auto& param : module.named_parameters()) {
-        const std::string& name = param.key();
+        // const std::string& name = param.key();  // Currently unused but may be needed for selective initialization
         torch::Tensor& tensor = param.value();
         
         // Skip 1D tensors (typically biases) for most initializations
@@ -289,12 +289,14 @@ void WeightInitializer::XavierNormal(torch::Tensor& tensor, float gain) {
 }
 
 void WeightInitializer::KaimingUniform(torch::Tensor& tensor, Activation activation) {
-    float gain = CalculateGain(activation);
+    // Note: PyTorch's kaiming_uniform_ uses its own gain calculation internally
+    (void)activation; // Suppress unused parameter warning - may be used in future implementations
     torch::nn::init::kaiming_uniform_(tensor, 0.0f, torch::kFanIn, torch::kReLU);
 }
 
 void WeightInitializer::KaimingNormal(torch::Tensor& tensor, Activation activation) {
-    float gain = CalculateGain(activation);
+    // Note: PyTorch's kaiming_normal_ uses its own gain calculation internally
+    (void)activation; // Suppress unused parameter warning - may be used in future implementations
     torch::nn::init::kaiming_normal_(tensor, 0.0f, torch::kFanIn, torch::kReLU);
 }
 

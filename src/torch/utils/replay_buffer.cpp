@@ -267,7 +267,7 @@ std::vector<size_t> ReplayBuffer::SampleIndices(size_t batch_size) {
     return indices;
 }
 
-std::vector<size_t> ReplayBuffer::SamplePrioritizedIndices(size_t batch_size, float alpha, float beta) {
+std::vector<size_t> ReplayBuffer::SamplePrioritizedIndices(size_t batch_size, float alpha, float /*beta*/) {
     // Calculate probability distribution based on priorities
     std::vector<float> probs(current_size_);
     float total_priority = 0.0f;
