@@ -4,12 +4,17 @@
 #include <vector>
 #include <cstdint>
 #include <iostream>
-#include "../torch_rl/utils/args.h"  // Include args.h for RenderMode
 
 #ifdef USE_SDL2
 #include <SDL2/SDL.h>
 #define SDL_AVAILABLE
 #endif
+
+enum class RenderMode {
+    SDL,
+    Console,
+    Headless
+};
 
 class Renderer {
 public:

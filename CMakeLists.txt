@@ -12,6 +12,7 @@ option(USE_SDL2 "Use SDL2 for renderer" OFF)
 option(STATIC_LINK_LIBS "Link SDL2, zlib, and minizip statically (auto-download/build)" OFF)
 option(BUILD_MAIN_APP "Build main PPOkemon application" OFF)
 option(BUILD_TEST_APP "Build basic test executable" ON)
+option(BUILD_POKERED_ROM "Automatically build Pokemon Red ROM for testing" ON)
 
 # ------------------------------------------------------------------------------
 # Include CMake modules
@@ -26,11 +27,12 @@ include(${CMAKE_SOURCE_DIR}/cmake/CompilerSettings.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/Dependencies.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/SourceFiles.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/LinkLibraries.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/PokeRED.cmake)
 
 # ------------------------------------------------------------------------------
 # PPOkemon Library
 # ------------------------------------------------------------------------------
-add_library(ppokemon_libs STATIC ${GAMBATTE_SOURCES} ${TORCH_RL_SOURCES})
+add_library(ppokemon_libs STATIC ${GAMBATTE_SOURCES} ${TORCH_RL_SOURCES} ${ENVIRONMENT_SOURCES})
 
 # Configure library
 target_compile_definitions(ppokemon_libs PRIVATE ${COMMON_DEFINITIONS})

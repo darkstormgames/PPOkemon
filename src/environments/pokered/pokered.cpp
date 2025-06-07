@@ -185,7 +185,7 @@ StepResultRaw Pokered::StepImpl(const float* action_data, int64_t action_size)
     current_state_ = rewards_calculator_->ReadGameState(emulator.get());
     
     // Update movement tracking
-    rewards_calculator_->UpdateMovementTracking(current_state_, last_state_, current_episode_length);
+    rewards_calculator_->UpdateMovementTracking(current_state_, last_state_, current_episode_length, emulator.get());
     
     // Calculate reward using the rewards calculator with emulator pointer
     float reward = rewards_calculator_->CalculateReward(emulator.get(), last_state_);

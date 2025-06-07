@@ -59,6 +59,7 @@ add_ppokemon_test(test_environments test_environments.cpp)
 add_ppokemon_test(test_environments_base test_environments_base.cpp)
 add_ppokemon_test(test_environments_vectorized test_environments_vectorized.cpp)
 add_ppokemon_test(test_environments_running_stats test_environments_running_stats.cpp)
+add_ppokemon_test(test_pokered_rewards test_pokered_rewards.cpp)
 
 # Utility tests
 add_ppokemon_test(test_utils test_utils.cpp)

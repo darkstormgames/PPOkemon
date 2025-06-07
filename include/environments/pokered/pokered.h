@@ -7,9 +7,7 @@
 #include "emulation/emu_gbc.h"
 #include "emulation/inputhandler.h"
 #include "emulation/renderer.h"
-
-// Forward declaration for rewards calculator
-class PokeredRewards;
+#include "environments/pokered/pokered_rewards.h"
 
 class Pokered : public AbstractEnv
 {

@@ -143,6 +143,15 @@ PokeredRewards::GameState PokeredRewards::ReadGameState(Emulator* emulator)
     uint8_t money_b3 = emulator->readMemory(PLAYER_MONEY_ADDR_BYTE_3);
     state.money = (money_b1 << 16) | (money_b2 << 8) | money_b3;
     
+    // Detect interactive state (timing counters will be updated in UpdateMovementTracking)
+    state.is_in_interactive_state = IsInInteractiveState(emulator);
+    
+    // Initialize timing counters (these will be properly updated in UpdateMovementTracking)
+    state.steps_in_battle = 0;
+    state.steps_in_dialog = 0;
+    state.steps_in_menu = 0;
+    state.enemy_present_in_battle = false;
+    
     return state;
 }
 
@@ -157,6 +166,14 @@ void PokeredRewards::InitializeGameState(Emulator* emulator, GameState& state)
     // Reset movement tracking
     state.steps_without_movement = 0;
     state.recent_positions.clear();
+    state.last_position = {state.player_x, state.player_y};
+    
+    // Initialize interactive state tracking
+    state.steps_in_battle = 0;
+    state.steps_in_dialog = 0;
+    state.steps_in_menu = 0;
+    state.enemy_present_in_battle = false;
+    state.recent_positions.clear();
     state.recent_positions.insert({state.player_x, state.player_y});
     state.last_position = {state.player_x, state.player_y};
     
@@ -166,7 +183,7 @@ void PokeredRewards::InitializeGameState(Emulator* emulator, GameState& state)
     event_flags_dirty_ = true;
 }
 
-void PokeredRewards::UpdateMovementTracking(GameState& current_state, const GameState& last_state, uint32_t episode_length)
+void PokeredRewards::UpdateMovementTracking(GameState& current_state, const GameState& last_state, uint32_t episode_length, Emulator* emulator)
 {
     // Update movement tracking
     std::pair<uint8_t, uint8_t> current_pos = {current_state.player_x, current_state.player_y};
@@ -190,6 +207,57 @@ void PokeredRewards::UpdateMovementTracking(GameState& current_state, const Game
     
     // Update visited maps
     current_state.visited_maps.insert(current_state.map_n);
+    
+    // Update interactive state timing counters
+    if (current_state.is_in_interactive_state) {
+        // Detect which specific interactive state we're currently in
+        bool currently_in_battle = IsInBattle(emulator);
+        bool currently_in_dialog = IsInDialog(emulator);
+        bool currently_in_menu = IsInMenu(emulator);
+        
+        // Initialize counters from last state if we were in an interactive state
+        if (last_state.is_in_interactive_state) {
+            current_state.steps_in_battle = last_state.steps_in_battle;
+            current_state.steps_in_dialog = last_state.steps_in_dialog;
+            current_state.steps_in_menu = last_state.steps_in_menu;
+            current_state.enemy_present_in_battle = last_state.enemy_present_in_battle;
+        }
+        
+        // Update counters based on current state
+        if (currently_in_battle) {
+            current_state.steps_in_battle++;
+            // Reset other counters when switching states
+            if (!last_state.is_in_interactive_state || !IsInBattle(emulator)) {
+                current_state.steps_in_dialog = 0;
+                current_state.steps_in_menu = 0;
+            }
+            // Check if enemy is present in battle
+            current_state.enemy_present_in_battle = emulator->readMemory(ENEMY_MON_1_HP_HIGH_BYTE_ADDR) > 0 || 
+                                                   emulator->readMemory(ENEMY_MON_1_HP_LOW_BYTE_ADDR) > 0;
+        } else if (currently_in_dialog) {
+            current_state.steps_in_dialog++;
+            // Reset other counters when switching states
+            if (!last_state.is_in_interactive_state) {
+                current_state.steps_in_battle = 0;
+                current_state.steps_in_menu = 0;
+            }
+            current_state.enemy_present_in_battle = false;
+        } else if (currently_in_menu) {
+            current_state.steps_in_menu++;
+            // Reset other counters when switching states
+            if (!last_state.is_in_interactive_state) {
+                current_state.steps_in_battle = 0;
+                current_state.steps_in_dialog = 0;
+            }
+            current_state.enemy_present_in_battle = false;
+        }
+    } else {
+        // Not in interactive state, reset all counters
+        current_state.steps_in_battle = 0;
+        current_state.steps_in_dialog = 0;
+        current_state.steps_in_menu = 0;
+        current_state.enemy_present_in_battle = false;
+    }
     
     // Reset recent positions periodically to encourage exploration
     if (episode_length % 4096 == 0) {
@@ -334,23 +402,77 @@ float PokeredRewards::CalculateMoneyReward(const GameState& current_state,
 }
 
 float PokeredRewards::CalculateStagnationPenalty(const GameState& current_state, 
-                                                 const GameState& last_state)
+                                                const GameState& last_state)
 {
+    float penalty = 0.0f;
+    
+    // Enhanced interactive state penalty logic
+    if (current_state.is_in_interactive_state) {
+        // Small penalties for prolonged menu or dialog states
+        if (current_state.steps_in_menu > 300) { // ~5 seconds in menu
+            penalty -= 0.001f * (current_state.steps_in_menu - 300) * 0.01f;
+        }
+        
+        if (current_state.steps_in_dialog > 600) { // ~10 seconds in same dialog
+            penalty -= 0.001f * (current_state.steps_in_dialog - 600) * 0.01f;
+        }
+        
+        // Battle penalty when no enemy is present for too long
+        if (current_state.steps_in_battle > 600 && !current_state.enemy_present_in_battle) {
+            penalty -= 0.002f * (current_state.steps_in_battle - 600) * 0.01f;
+        }
+        
+        // Return early with small penalty, don't apply regular stagnation penalties
+        return penalty;
+    }
+    
+    // Regular stagnation penalties (when not in interactive states)
+    
     // Penalty for staying in the same area too long without progress
     if (current_state.steps_without_movement > MAX_STEPS_WITHOUT_MOVEMENT) {
-        return STAGNATION_PENALTY_SCALE * (current_state.steps_without_movement - MAX_STEPS_WITHOUT_MOVEMENT);
+        penalty += STAGNATION_PENALTY_SCALE * (current_state.steps_without_movement - MAX_STEPS_WITHOUT_MOVEMENT);
     }
     
     // Penalty for cycling through too few positions
     if (current_state.recent_positions.size() < 5 && current_state.steps_without_movement > 50) {
-        return STAGNATION_PENALTY_SCALE * 10.0f;
+        penalty += STAGNATION_PENALTY_SCALE * 10.0f;
     }
     
     // Apply increasing penalty for staying in the same place
     if (current_state.steps_without_movement > 60) {  // After ~1 second of no movement
-        float penalty = std::min(0.01f, current_state.steps_without_movement * 0.00001f);
-        return -penalty;
+        float movement_penalty = std::min(0.01f, current_state.steps_without_movement * 0.00001f);
+        penalty -= movement_penalty;
     }
     
-    return 0.0f;
+    return penalty;
+}
+
+bool PokeredRewards::IsInInteractiveState(Emulator* emulator) const
+{
+    return IsInBattle(emulator) || IsInDialog(emulator) || IsInMenu(emulator);
+}
+
+bool PokeredRewards::IsInBattle(Emulator* emulator) const
+{
+    // Check wIsInBattle flag - non-zero when in battle
+    return emulator->readMemory(W_IS_IN_BATTLE_ADDR) != 0;
+}
+
+bool PokeredRewards::IsInDialog(Emulator* emulator) const
+{
+    // Check wTextBoxID and wJoyIgnore to detect dialog/text display
+    uint8_t text_box_id = emulator->readMemory(W_TEXT_BOX_ID_ADDR);
+    uint8_t joy_ignore = emulator->readMemory(W_JOY_IGNORE_ADDR);
+    
+    // Text box is active or input is disabled (indicating dialog/text)
+    return (text_box_id != 0) || (joy_ignore != 0);
+}
+
+bool PokeredRewards::IsInMenu(Emulator* emulator) const
+{
+    // Check wMaxMenuItem - when non-zero, indicates a menu is open
+    uint8_t max_menu_item = emulator->readMemory(W_MAX_MENU_ITEM_ADDR);
+    
+    // A menu is open if max_menu_item > 0
+    return max_menu_item > 0;
 }

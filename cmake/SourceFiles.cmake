@@ -33,6 +33,14 @@ file(GLOB_RECURSE TORCH_RL_SOURCES
 )
 
 # ------------------------------------------------------------------------------
+# Environment source files
+# ------------------------------------------------------------------------------
+file(GLOB_RECURSE ENVIRONMENT_SOURCES
+  ${CMAKE_SOURCE_DIR}/src/environments/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/emulation/*.cpp
+)
+
+# ------------------------------------------------------------------------------
 # Main application source files
 # ------------------------------------------------------------------------------
 file(READ ${CMAKE_SOURCE_DIR}/src/main.cpp MAIN_CONTENT)

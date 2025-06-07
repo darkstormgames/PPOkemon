@@ -37,6 +37,13 @@ public:
         uint32_t steps_without_movement;
         std::set<std::pair<uint8_t, uint8_t>> recent_positions;
         std::pair<uint8_t, uint8_t> last_position;
+        
+        // Interactive state tracking
+        bool is_in_interactive_state;
+        uint32_t steps_in_battle;
+        uint32_t steps_in_dialog;
+        uint32_t steps_in_menu;
+        bool enemy_present_in_battle;
     };
 
     PokeredRewards();
@@ -48,7 +55,24 @@ public:
     // State management functions
     GameState ReadGameState(Emulator* emulator);
     void InitializeGameState(Emulator* emulator, GameState& state);
-    void UpdateMovementTracking(GameState& current_state, const GameState& last_state, uint32_t episode_length);
+    void UpdateMovementTracking(GameState& current_state, const GameState& last_state, uint32_t episode_length, Emulator* emulator);
+
+    // Game state detection helpers (public for testing)
+    bool IsInInteractiveState(Emulator* emulator) const;
+    bool IsInBattle(Emulator* emulator) const;
+    bool IsInDialog(Emulator* emulator) const;
+    bool IsInMenu(Emulator* emulator) const;
+
+    // For unit testing - make penalty calculation public
+    float CalculateStagnationPenalty(const GameState& current_state, 
+                                    const GameState& last_state);
+
+    // Memory address constants (public for testing)
+    static constexpr uint16_t W_IS_IN_BATTLE_ADDR = 0xD057;        // wIsInBattle
+    static constexpr uint16_t W_TEXT_BOX_ID_ADDR = 0xD125;        // wTextBoxID
+    static constexpr uint16_t W_JOY_IGNORE_ADDR = 0xCD6B;         // wJoyIgnore - non-zero when input disabled
+    static constexpr uint16_t W_CURRENT_MENU_ITEM_ADDR = 0xCC26;  // wCurrentMenuItem
+    static constexpr uint16_t W_MAX_MENU_ITEM_ADDR = 0xCC28;      // wMaxMenuItem - indicates menu is open
 
 private:
     // Individual reward components
@@ -75,14 +99,11 @@ private:
     
     float CalculateMoneyReward(const GameState& current_state, 
                               const GameState& last_state);
-    
-    float CalculateStagnationPenalty(const GameState& current_state, 
-                                    const GameState& last_state);
 
     // Memory reading helpers
     uint16_t ReadU16BE(Emulator* emulator, uint16_t high_addr, uint16_t low_addr) const;
     uint16_t CalculatePartyChecksum(Emulator* emulator, uint8_t party_count) const;
-
+    
     // Reward scaling constants
     static constexpr float MOVEMENT_REWARD_SCALE = 0.001f;
     static constexpr float BADGE_REWARD_SCALE = 1.0f;
